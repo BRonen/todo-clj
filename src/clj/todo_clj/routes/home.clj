@@ -1,6 +1,6 @@
 (ns todo-clj.routes.home
   (:require
-   [todo-clj.config :as config]
+   [todo-clj.config :refer [env]]
    [todo-clj.layout :as layout]
    [clojure.java.io :as io]
    [todo-clj.middleware :as middleware]
@@ -9,7 +9,7 @@
    [todo-clj.db.users :as users]))
 
 (defn tttt-page [request]
-  (let [db (config/env :database-options)]
+  (let [db (env :database-options)]
     (println (users/insert-character db {:username "hello" :password "worldpass"})))
   (response/ok {:foo "bar"}))
 
