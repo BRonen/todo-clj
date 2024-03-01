@@ -9,8 +9,9 @@
    [todo-clj.db.users :as users]))
 
 (defn tttt-page [request]
+  (println request)
   (let [db (env :database-options)]
-    (println (users/insert-character db {:username "hello" :password "worldpass"})))
+    (println (users/insert-user db {:username "hello" :password "worldpass"})))
   (response/ok {:foo "bar"}))
 
 (defn home-page [request]

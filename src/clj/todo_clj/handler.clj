@@ -3,6 +3,7 @@
     [todo-clj.middleware :as middleware]
     [todo-clj.layout :refer [error-page]]
     [todo-clj.routes.home :refer [home-routes]]
+    [todo-clj.routes.users :refer [users-routes]]
     [reitit.ring :as ring]
     [ring.middleware.content-type :refer [wrap-content-type]]
     [ring.middleware.webjars :refer [wrap-webjars]]
@@ -22,7 +23,7 @@
   :start
   (ring/ring-handler
     (ring/router
-      [(home-routes)])
+      [(home-routes) (users-routes)])
     (ring/routes
       (ring/create-resource-handler
         {:path "/"})
