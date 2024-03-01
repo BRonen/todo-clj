@@ -28,13 +28,14 @@
                  [ring-webjars "0.2.0"]
                  [ring/ring-core "1.9.6"]
                  [ring/ring-defaults "0.3.4"]
-                 [selmer "1.12.55"]]
+                 [selmer "1.12.55"]
+                 [conman "0.9.6"]]
 
   :min-lein-version "2.0.0"
 
   :source-paths ["src/clj"]
   :test-paths ["test/clj"]
-  :resource-paths ["resources"]
+  :resource-paths ["resources", "src"]
   :target-path "target/%s/"
   :main ^:skip-aot todo-clj.core
 
@@ -57,6 +58,7 @@
                                  [ring/ring-devel "1.9.6"]
                                  [ring/ring-mock "0.4.0"]
                                  [migratus "1.5.5"]
+                                 [com.layerware/hugsql "0.5.3"]
                                  [org.postgresql/postgresql "42.1.4"]]
                   :plugins      [[com.jakemccrary/lein-test-refresh "0.24.1"]
                                  [jonase/eastwood "1.2.4"]
