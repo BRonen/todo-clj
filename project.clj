@@ -29,7 +29,9 @@
                  [ring/ring-core "1.9.6"]
                  [ring/ring-defaults "0.3.4"]
                  [selmer "1.12.55"]
-                 [conman "0.9.6"]]
+                 [conman "0.9.6"]
+                 [buddy/buddy-sign "1.1.0"]
+                 [buddy/buddy-hashers "1.4.0"]]
 
   :min-lein-version "2.0.0"
 
