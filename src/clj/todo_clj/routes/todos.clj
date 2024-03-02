@@ -33,7 +33,16 @@
         result (first (todos/delete-todo db {:id (:todo_id body) :user_id userid}))]
     (response/ok {:todo result})))
 
+(defn mark-as-complete-page [request]
+  (let [db (env :database-options)
+        token (get (:headers request) "authorization")
+        payload (jwt/unsign token "test-key")
+        userid (:id (:user payload))
+        body (:body-params request)
+        result (first (todos/update-complete-todo db (assoc {:id (:todo_id body) :completed (:completed body)} :user_id userid)))]
+    (response/ok {:todo result})))
+
 (defn todos-routes []
   [""
    {:middleware [middleware/wrap-formats]}
-   ["/todos/" {:get index-page :post create-page :delete delete-page}]])
+   ["/todos/" {:get index-page :post create-page :delete delete-page :patch mark-as-complete-page}]])

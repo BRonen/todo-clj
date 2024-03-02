@@ -20,6 +20,13 @@ DELETE FROM todos
 WHERE user_id = :user_id AND id = :id
 RETURNING *
 
+-- :name update-complete-todo
+-- :doc Insert multiple characters with :tuple* parameter type
+UPDATE todos
+SET completed = :completed
+WHERE user_id = :user_id AND id = :id
+RETURNING *
+
 -- :name insert-characters :! :n
 -- :doc Insert multiple characters with :tuple* parameter type
 /* insert into characters (username, password)
