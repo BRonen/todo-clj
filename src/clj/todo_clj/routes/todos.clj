@@ -8,7 +8,7 @@
    [todo-clj.db.todos :as todos]))
 
 (defn index-page [request]
-  (let [db (env :database-options)
+  (let [db (env :database-url)
         token (get (:headers request) "authorization")
         payload (jwt/unsign token "test-key")
         searchParams (:body-params request)
@@ -16,7 +16,7 @@
     (response/ok {:todos result})))
 
 (defn create-page [request]
-  (let [db (env :database-options)
+  (let [db (env :database-url)
         token (get (:headers request) "authorization")
         payload (jwt/unsign token "test-key")
         userid (:id (:user payload))
@@ -25,7 +25,7 @@
     (response/ok {:todo result})))
 
 (defn delete-page [request]
-  (let [db (env :database-options)
+  (let [db (env :database-url)
         token (get (:headers request) "authorization")
         payload (jwt/unsign token "test-key")
         userid (:id (:user payload))
@@ -34,7 +34,7 @@
     (response/ok {:todo result})))
 
 (defn mark-as-complete-page [request]
-  (let [db (env :database-options)
+  (let [db (env :database-url)
         token (get (:headers request) "authorization")
         payload (jwt/unsign token "test-key")
         userid (:id (:user payload))

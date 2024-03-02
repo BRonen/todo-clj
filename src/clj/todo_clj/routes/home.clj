@@ -10,7 +10,7 @@
 
 (defn tttt-page [request]
   (println request)
-  (let [db (env :database-options)]
+  (let [db (env :database-url)]
     (println (users/insert-user db {:username "hello" :password "worldpass"})))
   (response/ok {:foo "bar"}))
 

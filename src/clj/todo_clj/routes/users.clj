@@ -9,13 +9,13 @@
    [todo-clj.db.users :as users]))
 
 (defn index-page [request]
-  (let [db (env :database-options)
+  (let [db (env :database-url)
         searchParams (:body-params request)
         result (users/select-users db searchParams)]
     (response/ok {:users result})))
 
 (defn create-page [request]
-  (let [db (env :database-options)
+  (let [db (env :database-url)
         body (:body-params request)
         userdata {:username (:username body)
                   :password (hashers/derive (:password body))}
@@ -29,7 +29,7 @@
     (response/ok payload)))
 
 (defn create-auth-page [request]
-  (let [db (env :database-options)
+  (let [db (env :database-url)
         body (:body-params request)
         result (first (users/select-user-by-email db body))]
     (if (hashers/check
