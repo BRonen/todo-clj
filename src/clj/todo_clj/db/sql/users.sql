@@ -1,7 +1,7 @@
 -- src/clj/todo_clj/db/sql/users.sql
 -- To-do users
 
--- :name select-user
+-- :name select-users
 -- :doc Insert multiple characters with :tuple* parameter type
 SELECT id, username
 FROM users

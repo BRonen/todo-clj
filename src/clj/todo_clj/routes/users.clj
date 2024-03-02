@@ -11,7 +11,7 @@
 (defn index-page [request]
   (let [db (env :database-options)
         searchParams (:body-params request)
-        result (users/select-user db searchParams)]
+        result (users/select-users db searchParams)]
     (response/ok {:users result})))
 
 (defn create-page [request]
