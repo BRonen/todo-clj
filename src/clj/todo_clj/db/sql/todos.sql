@@ -14,6 +14,12 @@ INSERT INTO todos (name, description, completed, user_id)
 VALUES (:name, :description, :completed, :user_id)
 RETURNING id, name, description, completed, user_id
 
+-- :name delete-todo
+-- :doc Insert multiple characters with :tuple* parameter type
+DELETE FROM todos
+WHERE user_id = :user_id AND id = :id
+RETURNING *
+
 -- :name insert-characters :! :n
 -- :doc Insert multiple characters with :tuple* parameter type
 /* insert into characters (username, password)
