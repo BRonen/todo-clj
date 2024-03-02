@@ -3,6 +3,3 @@ CREATE TABLE users (
     username VARCHAR(32) NOT NULL,
     password VARCHAR(1024) NOT NULL
 );
-
-CREATE INDEX idx_username
- ON users (username);
