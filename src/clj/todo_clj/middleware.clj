@@ -6,7 +6,6 @@
     [ring.middleware.anti-forgery :refer [wrap-anti-forgery]]
     [todo-clj.middleware.formats :as formats]
     [muuntaja.middleware :refer [wrap-format wrap-params]]
-    [todo-clj.config :refer [env]]
     [ring.middleware.flash :refer [wrap-flash]]
     [ring.adapter.undertow.middleware.session :refer [wrap-session]]
     [ring.middleware.defaults :refer [site-defaults wrap-defaults]])
