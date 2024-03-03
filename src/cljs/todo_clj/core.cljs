@@ -8,7 +8,7 @@
 (defn page []
     [:div
      [:label (str "current count: " @counter)]
-     [:button {:on-click #(swap! counter inc)} (str "Click me!")]])
+     [:button {:class ["bg-red-500"] :on-click #(swap! counter inc)} (str "Click me!")]])
 
 (defn ^:export render []
   (rdom/render

@@ -24,3 +24,4 @@ pom.xml.asc
 /.lsp
 /.clj-kondo
 /resources/public/js/*
+/resources/public/css/styles.css
