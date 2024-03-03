@@ -1,0 +1,16 @@
+(ns todo-clj.core
+  (:require
+   [reagent.dom :as rdom]
+   [reagent.core :as r]))
+
+(defonce counter (r/atom 0))
+
+(defn page []
+    [:div
+     [:label (str "current count: " @counter)]
+     [:button {:on-click #(swap! counter inc)} (str "Click me!")]])
+
+(defn ^:export render []
+  (rdom/render
+   [page]
+   (.getElementById js/document "app")))
