@@ -37,7 +37,8 @@
                  [reagent "1.1.0"]
                  [thheller/shadow-cljs "2.15.2" :scope "provided"]
                  [cljsjs/react "17.0.2-0"]
-                 [cljsjs/react-dom "17.0.2-0"]]
+                 [cljsjs/react-dom "17.0.2-0"]
+                 [lambdaisland/fetch "1.5.83"]]
 
   :min-lein-version "2.0.0"
 
