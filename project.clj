@@ -29,12 +29,19 @@
                  [ring/ring-core "1.9.6"]
                  [ring/ring-defaults "0.3.4"]
                  [selmer "1.12.55"]
+                 [migratus "1.5.5"]
+                 [com.layerware/hugsql "0.5.3"]
+                 [org.postgresql/postgresql "42.1.4"]
                  [buddy/buddy-sign "1.1.0"]
-                 [buddy/buddy-hashers "1.4.0"]]
+                 [buddy/buddy-hashers "1.4.0"]
+                 [reagent "1.1.0"]
+                 [thheller/shadow-cljs "2.15.2" :scope "provided"]
+                 [cljsjs/react "17.0.2-0"]
+                 [cljsjs/react-dom "17.0.2-0"]]
 
   :min-lein-version "2.0.0"
 
-  :source-paths ["src/clj"]
+  :source-paths ["src/clj" "src/cljs"]
   :test-paths ["test/clj"]
   :resource-paths ["resources", "src"]
   :target-path "target/%s/"
@@ -47,7 +54,8 @@
              :aot :all
              :uberjar-name "todo-clj.jar"
              :source-paths ["env/prod/clj"]
-             :resource-paths ["env/prod/resources"]}
+             :resource-paths ["env/prod/resources"]
+             :prep-tasks ["compile" ["run" "-m" "shadow.cljs.devtools.cli" "release" "app"]]}
 
    :dev           [:project/dev :profiles/dev]
    :test          [:project/dev :project/test :profiles/test]
@@ -57,10 +65,7 @@
                                  [pjstadig/humane-test-output "0.11.0"]
                                  [prone "2021-04-23"]
                                  [ring/ring-devel "1.9.6"]
-                                 [ring/ring-mock "0.4.0"]
-                                 [migratus "1.5.5"]
-                                 [com.layerware/hugsql "0.5.3"]
-                                 [org.postgresql/postgresql "42.1.4"]]
+                                 [ring/ring-mock "0.4.0"]]
                   :plugins      [[com.jakemccrary/lein-test-refresh "0.24.1"]
                                  [jonase/eastwood "1.2.4"]
                                  [cider/cider-nrepl "0.26.0"]
