@@ -1,7 +1,7 @@
 (ns todo-clj.handler
   (:require
     [todo-clj.middleware :as middleware]
-    [todo-clj.layout :refer [error-page]]
+    [todo-clj.layout :refer [error-page, render]]
     [todo-clj.routes.home :refer [home-routes]]
     [todo-clj.routes.users :refer [users-routes]]
     [todo-clj.routes.todos :refer [todos-routes]]
@@ -26,13 +26,11 @@
     (ring/router
       [(home-routes) (users-routes) (todos-routes)])
     (ring/routes
-      (ring/create-resource-handler
-        {:path "/"})
       (wrap-content-type
         (wrap-webjars async-aware-default-handler))
       (ring/create-default-handler
         {:not-found
-         (constantly (error-page {:status 404, :title "404 - Page not found"}))
+         (fn home-page [request] (render request "index.html"))
          :method-not-allowed
          (constantly (error-page {:status 405, :title "405 - Not allowed"}))
          :not-acceptable
