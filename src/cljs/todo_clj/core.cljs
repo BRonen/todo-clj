@@ -5,47 +5,70 @@
    [reitit.frontend :as rf]
    [reitit.frontend.easy :as rfe]
    [reitit.coercion.spec :as rss]
-   [lambdaisland.fetch :as fetch]))
+   [lambdaisland.fetch :as fetch]
+   [goog.object :as gobj]))
+
+(defn register-user [payload]
+  (-> (fetch/post "/users/" {:accept :json
+                             :content-type :json
+                             :body payload})
+      (.then (fn [resp] (.log js/console (-> resp :body (gobj/get "users")))))))
 
 (defn register-page []
-  (let [counter (r/atom 0)]
+  (let [formstate (r/atom {:username "" :password ""})
+        submithandler (fn [e] (.preventDefault e) (register-user @formstate))]
     (fn []
       [:div
-       [:form {:class "flex flex-col w-2/3 mx-auto mt-12"}
+       [:form {:class "flex flex-col w-2/3 md:w-1/3 mx-auto mt-12" :on-submit submithandler}
         [:h1 {:class "text-xl text-center"} "Register"]
         [:label {:for "username"} "Username"]
         [:input {:type "text"
                  :placeholder "username..."
                  :name "username"
                  :id "username"
-                 :class "px-2 py-1 border rounded mb-2"}]
+                 :class "px-2 py-1 border rounded mb-2"
+                 :on-change #(swap! formstate assoc :username (.-value (.-target %)))
+                 :value (str (:username @formstate))}]
         [:label {:for "password"} "Password"]
         [:input {:type "text"
                  :placeholder "password..."
                  :name "password"
                  :id "password"
-                 :class "px-2 py-1 border rounded"}]
-        [:button {:class ["bg-stone-300 mt-4 rounded p-1"] :on-click #(swap! counter inc)} (str "Login")]]])))
+                 :class "px-2 py-1 border rounded"
+                 :on-change #(swap! formstate assoc :password (.-value (.-target %)))
+                 :value (str (:password @formstate))}]
+        [:button {:class ["bg-stone-300 mt-4 rounded p-1"]} "Register"]]])))
+
+(defn login-user [payload]
+  (-> (fetch/post "/users/auth" {:accept :json
+                                 :content-type :json
+                                 :body payload})
+      (.then (fn [resp] (.log js/console (-> resp :body (gobj/get "users")))))))
 
 (defn login-page []
-  (let [counter (r/atom 0)]
+  (let [formstate (r/atom {:username "" :password ""})
+        submithandler (fn [e] (.preventDefault e) (login-user @formstate))]
     (fn []
       [:div
-       [:form {:class "flex flex-col w-2/3 mx-auto mt-12"}
+       [:form {:class "flex flex-col w-2/3 md:w-1/3 mx-auto mt-12" :on-submit submithandler}
         [:h1 {:class "text-xl text-center"} "Login"]
         [:label {:for "username"} "Username"]
         [:input {:type "text"
                  :placeholder "username..."
                  :name "username"
                  :id "username"
-                 :class "px-2 py-1 border rounded mb-2"}]
+                 :class "px-2 py-1 border rounded mb-2"
+                 :on-change #(swap! formstate assoc :username (.-value (.-target %)))
+                 :value (str (:username @formstate))}]
         [:label {:for "password"} "Password"]
         [:input {:type "text"
                  :placeholder "password..."
                  :name "password"
                  :id "password"
-                 :class "px-2 py-1 border rounded"}]
-        [:button {:class ["bg-stone-300 mt-4 rounded p-1"] :on-click #(swap! counter inc)} (str "Login")]]])))
+                 :class "px-2 py-1 border rounded"
+                 :on-change #(swap! formstate assoc :password (.-value (.-target %)))
+                 :value (str (:password @formstate))}]
+        [:button {:class ["bg-stone-300 mt-4 rounded p-1"]} (str "Login")]]])))
 
 (defn home-page []
   (let [counter (r/atom 0)]
@@ -53,7 +76,6 @@
       [:div
        [:label (str "current count: " @counter)]
        [:button {:class ["bg-red-500"] :on-click #(swap! counter inc)} (str "Home!")]])))
-
 
 (defonce match (r/atom nil))
 

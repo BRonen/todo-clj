@@ -11,7 +11,8 @@
   (let [db (env :database-url)
         token (get (:headers request) "authorization")
         payload (jwt/unsign token "test-key")
-        searchParams (:body-params request)
+        rawparams (:params request)
+        searchParams {:limit (Integer/parseInt (:limit rawparams))}
         result (todos/select-todos db (assoc searchParams :user_id (:id (:user payload))))]
     (response/ok {:todos result})))
 

@@ -10,7 +10,8 @@
 
 (defn index-page [request]
   (let [db (env :database-url)
-        searchParams (:body-params request)
+        rawparams (:params request)
+        searchParams {:limit (Integer/parseInt (:limit rawparams))}
         result (users/select-users db searchParams)]
     (response/ok {:users result})))
 
@@ -36,7 +37,7 @@
          (:password body)
          (:password result))
       (response/ok (jwt/sign {:user (dissoc result :password)} "test-key"))
-      (response/ok "wasdwasd erro haha"))))
+      (response/ok {:error "user not found or wrong password"}))))
 
 (defn users-routes []
   [""
