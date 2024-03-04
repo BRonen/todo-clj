@@ -8,36 +8,51 @@
    [lambdaisland.fetch :as fetch]
    [goog.object :as gobj]))
 
+(defn loading-component []
+  [:div
+   {:class "h-60 flex items-center justify-center"}
+   [:div {:style {:width "3rem",
+                  :height "3rem",
+                  :margin "auto",
+                  :border "3px solid transparent",
+                  :border-bottom "3px solid black",
+                  :border-top "3px solid black",
+                  :border-radius "9999px",
+                  :animation "roll 1.5s linear infinite"}}]])
+
 (defn register-user [payload]
   (-> (fetch/post "/users/" {:accept :json
                              :content-type :json
                              :body payload})
-      (.then (fn [resp] (.log js/console (-> resp :body (gobj/get "users")))))))
+      (.then (fn [resp] (let [token (-> resp :body (gobj/get "token"))]
+                          (.setItem (.-localStorage js/window) "auth_token" token)
+                          (rfe/push-state ::homepage))))))
 
 (defn register-page []
   (let [formstate (r/atom {:username "" :password ""})
-        submithandler (fn [e] (.preventDefault e) (register-user @formstate))]
+        loading (r/atom false)
+        submithandler (fn [e] (.preventDefault e) (swap! loading (fn [_] true)) (register-user @formstate))]
     (fn []
-      [:div
-       [:form {:class "flex flex-col w-2/3 md:w-1/3 mx-auto mt-12" :on-submit submithandler}
-        [:h1 {:class "text-xl text-center"} "Register"]
-        [:label {:for "username"} "Username"]
-        [:input {:type "text"
-                 :placeholder "username..."
-                 :name "username"
-                 :id "username"
-                 :class "px-2 py-1 border rounded mb-2"
-                 :on-change #(swap! formstate assoc :username (.-value (.-target %)))
-                 :value (str (:username @formstate))}]
-        [:label {:for "password"} "Password"]
-        [:input {:type "text"
-                 :placeholder "password..."
-                 :name "password"
-                 :id "password"
-                 :class "px-2 py-1 border rounded"
-                 :on-change #(swap! formstate assoc :password (.-value (.-target %)))
-                 :value (str (:password @formstate))}]
-        [:button {:class ["bg-stone-300 mt-4 rounded p-1"]} "Register"]]])))
+      (if @loading loading-component [:div
+                                     [:form {:class "flex flex-col w-2/3 md:w-1/3 mx-auto mt-12" :on-submit submithandler}
+                                      [:h1 {:class "text-xl text-center"} "Register"]
+                                      [:label {:for "username"} "Username"]
+                                      [:input {:type "text"
+                                               :placeholder "username..."
+                                               :name "username"
+                                               :id "username"
+                                               :class "px-2 py-1 border rounded mb-2"
+                                               :on-change #(swap! formstate assoc :username (.-value (.-target %)))
+                                               :value (str (:username @formstate))}]
+                                      [:label {:for "password"} "Password"]
+                                      [:input {:type "text"
+                                               :placeholder "password..."
+                                               :name "password"
+                                               :id "password"
+                                               :class "px-2 py-1 border rounded"
+                                               :on-change #(swap! formstate assoc :password (.-value (.-target %)))
+                                               :value (str (:password @formstate))}]
+                                      [:button {:class ["bg-stone-300 mt-4 rounded p-1"]} "Register"]]]))))
 
 (defn login-user [payload]
   (-> (fetch/post "/users/auth" {:accept :json
@@ -47,28 +62,29 @@
 
 (defn login-page []
   (let [formstate (r/atom {:username "" :password ""})
-        submithandler (fn [e] (.preventDefault e) (login-user @formstate))]
+        loading (r/atom false)
+        submithandler (fn [e] (.preventDefault e) (swap! loading (fn [_] true)) (login-user @formstate))]
     (fn []
-      [:div
-       [:form {:class "flex flex-col w-2/3 md:w-1/3 mx-auto mt-12" :on-submit submithandler}
-        [:h1 {:class "text-xl text-center"} "Login"]
-        [:label {:for "username"} "Username"]
-        [:input {:type "text"
-                 :placeholder "username..."
-                 :name "username"
-                 :id "username"
-                 :class "px-2 py-1 border rounded mb-2"
-                 :on-change #(swap! formstate assoc :username (.-value (.-target %)))
-                 :value (str (:username @formstate))}]
-        [:label {:for "password"} "Password"]
-        [:input {:type "text"
-                 :placeholder "password..."
-                 :name "password"
-                 :id "password"
-                 :class "px-2 py-1 border rounded"
-                 :on-change #(swap! formstate assoc :password (.-value (.-target %)))
-                 :value (str (:password @formstate))}]
-        [:button {:class ["bg-stone-300 mt-4 rounded p-1"]} (str "Login")]]])))
+      (if @loading loading-component [:div
+                                      [:form {:class "flex flex-col w-2/3 md:w-1/3 mx-auto mt-12" :on-submit submithandler}
+                                       [:h1 {:class "text-xl text-center"} "Login"]
+                                       [:label {:for "username"} "Username"]
+                                       [:input {:type "text"
+                                                :placeholder "username..."
+                                                :name "username"
+                                                :id "username"
+                                                :class "px-2 py-1 border rounded mb-2"
+                                                :on-change #(swap! formstate assoc :username (.-value (.-target %)))
+                                                :value (str (:username @formstate))}]
+                                       [:label {:for "password"} "Password"]
+                                       [:input {:type "text"
+                                                :placeholder "password..."
+                                                :name "password"
+                                                :id "password"
+                                                :class "px-2 py-1 border rounded"
+                                                :on-change #(swap! formstate assoc :password (.-value (.-target %)))
+                                                :value (str (:password @formstate))}]
+                                       [:button {:class ["bg-stone-300 mt-4 rounded p-1"]} (str "Login")]]]))))
 
 (defn home-page []
   (let [counter (r/atom 0)]
