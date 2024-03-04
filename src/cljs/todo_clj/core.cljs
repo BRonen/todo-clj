@@ -34,31 +34,33 @@
         submithandler (fn [e] (.preventDefault e) (swap! loading (fn [_] true)) (register-user @formstate))]
     (fn []
       (if @loading loading-component [:div
-                                     [:form {:class "flex flex-col w-2/3 md:w-1/3 mx-auto mt-12" :on-submit submithandler}
-                                      [:h1 {:class "text-xl text-center"} "Register"]
-                                      [:label {:for "username"} "Username"]
-                                      [:input {:type "text"
-                                               :placeholder "username..."
-                                               :name "username"
-                                               :id "username"
-                                               :class "px-2 py-1 border rounded mb-2"
-                                               :on-change #(swap! formstate assoc :username (.-value (.-target %)))
-                                               :value (str (:username @formstate))}]
-                                      [:label {:for "password"} "Password"]
-                                      [:input {:type "text"
-                                               :placeholder "password..."
-                                               :name "password"
-                                               :id "password"
-                                               :class "px-2 py-1 border rounded"
-                                               :on-change #(swap! formstate assoc :password (.-value (.-target %)))
-                                               :value (str (:password @formstate))}]
-                                      [:button {:class ["bg-stone-300 mt-4 rounded p-1"]} "Register"]]]))))
+                                      [:form {:class "flex flex-col w-2/3 md:w-1/3 mx-auto mt-12" :on-submit submithandler}
+                                       [:h1 {:class "text-xl text-center"} "Register"]
+                                       [:label {:for "username"} "Username"]
+                                       [:input {:type "text"
+                                                :placeholder "username..."
+                                                :name "username"
+                                                :id "username"
+                                                :class "px-2 py-1 border rounded mb-2"
+                                                :on-change #(swap! formstate assoc :username (.-value (.-target %)))
+                                                :value (str (:username @formstate))}]
+                                       [:label {:for "password"} "Password"]
+                                       [:input {:type "text"
+                                                :placeholder "password..."
+                                                :name "password"
+                                                :id "password"
+                                                :class "px-2 py-1 border rounded"
+                                                :on-change #(swap! formstate assoc :password (.-value (.-target %)))
+                                                :value (str (:password @formstate))}]
+                                       [:button {:class ["bg-stone-300 mt-4 rounded p-1"]} "Register"]]]))))
 
 (defn login-user [payload]
   (-> (fetch/post "/users/auth" {:accept :json
                                  :content-type :json
                                  :body payload})
-      (.then (fn [resp] (.log js/console (-> resp :body (gobj/get "users")))))))
+      (.then (fn [resp] (let [token (-> resp :body)]
+                          (.setItem (.-localStorage js/window) "auth_token" token)
+                          (rfe/push-state ::homepage))))))
 
 (defn login-page []
   (let [formstate (r/atom {:username "" :password ""})
