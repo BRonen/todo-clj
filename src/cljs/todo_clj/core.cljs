@@ -45,13 +45,14 @@
                                                 :on-change #(swap! formstate assoc :username (.-value (.-target %)))
                                                 :value (str (:username @formstate))}]
                                        [:label {:for "password"} "Password"]
-                                       [:input {:type "text"
+                                       [:input {:type "password"
                                                 :placeholder "password..."
                                                 :name "password"
                                                 :id "password"
                                                 :class "px-2 py-1 border rounded"
                                                 :on-change #(swap! formstate assoc :password (.-value (.-target %)))
                                                 :value (str (:password @formstate))}]
+                                       [:a {:class "w-full text-end underline" :href (rfe/href ::loginpage)} "login page"]
                                        [:button {:class ["bg-stone-300 mt-4 rounded p-1"]} "Register"]]]))))
 
 (defn login-user [payload]
@@ -79,30 +80,101 @@
                                                 :on-change #(swap! formstate assoc :username (.-value (.-target %)))
                                                 :value (str (:username @formstate))}]
                                        [:label {:for "password"} "Password"]
-                                       [:input {:type "text"
+                                       [:input {:type "password"
                                                 :placeholder "password..."
                                                 :name "password"
                                                 :id "password"
                                                 :class "px-2 py-1 border rounded"
                                                 :on-change #(swap! formstate assoc :password (.-value (.-target %)))
                                                 :value (str (:password @formstate))}]
+                                       [:a {:class "w-full text-end underline" :href (rfe/href ::registerpage)} "register page"]
                                        [:button {:class ["bg-stone-300 mt-4 rounded p-1"]} (str "Login")]]]))))
 
+(defn mark-as-completed [todo]
+  (-> (fetch/request "/todos/" {:method :patch
+                                :accept :json
+                                :content-type :json
+                                :body {:todo_id (.-id todo) :completed (not (boolean (.-completed todo)))}
+                                :headers {"authorization" (.getItem (.-localStorage js/window) "auth_token")}})
+      (.then (fn [_] (rfe/push-state ::homepage)))))
+
+(defn get-todos []
+  (-> (fetch/get "/todos/?limit=10" {:accept :json
+                                     :content-type :json
+                                     :headers {"authorization" (.getItem (.-localStorage js/window) "auth_token")}})
+      (.then (fn [response] (-> response :body (gobj/get "todos") vec)))))
+
 (defn home-page []
-  (let [counter (r/atom 0)]
+  (let [loading (r/atom true)
+        todos (r/atom [])
+        load-todos (fn []
+                     (reset! loading true)
+                     (-> (get-todos)
+                         (.then (fn [data]
+                                  (reset! todos data)
+                                  (reset! loading false)))))
+        checkbox-handler (fn [todo] (-> (mark-as-completed todo) (.then load-todos)))]
+    (r/create-class
+     {:display-name "home-page"
+      :reagent-render (fn home-page-render []
+                        (if @loading
+                          (loading-component)
+                          [:div {:class "flex flex-col gap-4 md:w-1/3 w-2/3 mx-auto"}
+                           [:h1 {:class "text-3xl"} "To-dos:"]
+                           [:ul (map (fn [todo]
+                                       [:li {:key (.-id todo) :class "flex gap-4 mt-2" :on-click (fn [] (checkbox-handler todo))}
+                                        [:input {:type "checkbox" :class "w-4" :defaultChecked (.-completed todo)}]
+                                        [:div
+                                         [:h1 {:class "text-xl"} (.-name todo)]
+                                         [:p (.-description todo)]]]) @todos)]
+                           [:button {:class ["bg-stone-300 mt-3"] :on-click (fn [] (rfe/push-state ::newtodo))} "New todo"]]))
+      :component-did-mount load-todos})))
+
+(defn create-todo [payload]
+  (-> (fetch/post "/todos/" {:accept :json
+                             :content-type :json
+                             :headers {"authorization" (.getItem (.-localStorage js/window) "auth_token")}
+                             :body (assoc payload :completed false)})
+      (.then (fn [_] (rfe/push-state ::homepage)))))
+
+(defn new-todo-page []
+  (let [formstate (r/atom {:name "" :description ""})
+        loading (r/atom false)
+        submithandler (fn [e] (.preventDefault e) (swap! loading (fn [_] true)) (create-todo @formstate))]
     (fn []
-      [:div
-       [:label (str "current count: " @counter)]
-       [:button {:class ["bg-red-500"] :on-click #(swap! counter inc)} (str "Home!")]])))
+      (if @loading loading-component [:div
+                                      [:form {:class "flex flex-col w-2/3 md:w-1/3 mx-auto mt-12" :on-submit submithandler}
+                                       [:h1 {:class "text-xl text-center"} "New Todo"]
+                                       [:label {:for "name"} "Name"]
+                                       [:input {:type "text"
+                                                :placeholder "name"
+                                                :name "name"
+                                                :id "name"
+                                                :class "px-2 py-1 border rounded mb-2"
+                                                :on-change #(swap! formstate assoc :name (.-value (.-target %)))
+                                                :value (str (:name @formstate))}]
+                                       [:label {:for "description"} "Description"]
+                                       [:input {:type "description"
+                                                :placeholder "description"
+                                                :name "description"
+                                                :id "description"
+                                                :class "px-2 py-1 border rounded"
+                                                :on-change #(swap! formstate assoc :description (.-value (.-target %)))
+                                                :value (str (:description @formstate))}]
+                                       [:div {:class "flex gap-2"}
+                                        [:button {:class ["bg-stone-300 mt-4 rounded p-1 w-full"] :on-click (fn [e] (.preventDefault e) (rfe/push-state ::homepage))} "Cancel"]
+                                        [:button {:class ["bg-stone-300 mt-4 rounded p-1 w-full"]} "Confirm"]]]]))))
 
 (defonce match (r/atom nil))
 
 (defn current-page []
   [:div
-   [:ul {:class "flex gap-5"}
-    [:li [:a {:href (rfe/href ::loginpage)} "Login"]]
-    [:li [:a {:href (rfe/href ::homepage)} "About"]]
-    [:li [:a {:href (rfe/href ::registerpage)} "Register"]]]
+   (when (= (:view (:data @match)) home-page)
+     [:div
+      {:class "flex justify-end w-full"}
+      [:a {:class "py-2 px-4"
+           :href (rfe/href ::loginpage)
+           :on-click (fn [] (.clear (.-localStorage js/window) "auth_token"))} "Logout"]])
    (if @match
      (let [view (:view (:data @match))]
        [view @match])
@@ -111,6 +183,8 @@
 (def routes
   [["/" {:name ::homepage
          :view home-page}]
+   ["/new-todo" {:name ::newtodo
+                 :view new-todo-page}]
    ["/login" {:name ::loginpage
               :view login-page}]
    ["/register" {:name ::registerpage

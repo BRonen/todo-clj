@@ -40,7 +40,7 @@
         payload (jwt/unsign token "test-key")
         userid (:id (:user payload))
         body (:body-params request)
-        result (first (todos/update-complete-todo db (assoc {:id (:todo_id body) :completed (:completed body)} :user_id userid)))]
+        result (first (todos/update-complete-todo db {:id (:todo_id body) :completed (:completed body) :user_id userid}))]
     (response/ok {:todo result})))
 
 (defn todos-routes []
