@@ -122,11 +122,11 @@
                           [:div {:class "flex flex-col gap-4 md:w-1/3 w-2/3 mx-auto"}
                            [:h1 {:class "text-3xl"} "To-dos:"]
                            [:ul (map (fn [todo]
-                                       [:li {:key (.-id todo) :class "flex gap-4 mt-2" :on-click (fn [] (checkbox-handler todo))}
-                                        [:input {:type "checkbox" :class "w-4" :defaultChecked (.-completed todo)}]
+                                       [:li {:key (.-id todo) :class "flex gap-4 mt-2 cursor-pointer" :on-click (fn [] (checkbox-handler todo))}
+                                        [:input {:type "checkbox" :class "w-4 cursor-pointer" :default-checked (.-completed todo)}]
                                         [:div
-                                         [:h1 {:class "text-xl"} (.-name todo)]
-                                         [:p (.-description todo)]]]) @todos)]
+                                         [:h1 {:class (str "text-xl" (when (.-completed todo) " text-stone-400 line-through"))} (.-name todo)]
+                                         [:p {:class (when (.-completed todo) "text-stone-400 line-through")} (.-description todo)]]]) @todos)]
                            [:button {:class ["bg-stone-300 mt-3"] :on-click (fn [] (rfe/push-state ::newtodo))} "New todo"]]))
       :component-did-mount load-todos})))
 
