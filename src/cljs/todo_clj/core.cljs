@@ -98,6 +98,12 @@
                                 :headers {"authorization" (.getItem (.-localStorage js/window) "auth_token")}})
       (.then (fn [_] (rfe/push-state ::homepage)))))
 
+(defn delete-todo [todo]
+  (fetch/delete "/todos/" {:accept :json
+                               :content-type :json
+                               :body {:todo_id (.-id todo) :completed (not (boolean (.-completed todo)))}
+                               :headers {"authorization" (.getItem (.-localStorage js/window) "auth_token")}}))
+
 (defn get-todos []
   (-> (fetch/get "/todos/?limit=10" {:accept :json
                                      :content-type :json
@@ -122,11 +128,15 @@
                           [:div {:class "flex flex-col gap-4 md:w-1/3 w-2/3 mx-auto"}
                            [:h1 {:class "text-3xl"} "To-dos:"]
                            [:ul (map (fn [todo]
-                                       [:li {:key (.-id todo) :class "flex gap-4 mt-2 cursor-pointer" :on-click (fn [] (checkbox-handler todo))}
-                                        [:input {:type "checkbox" :class "w-4 cursor-pointer" :default-checked (.-completed todo)}]
-                                        [:div
+                                       [:li {:key (.-id todo) :class "flex gap-4 mt-2 cursor-pointer"}
+                                        [:input {:type "checkbox" :class "w-4 cursor-pointer" :default-checked (.-completed todo) :on-click (fn [] (checkbox-handler todo))}]
+                                        [:div {:on-click (fn [] (checkbox-handler todo))}
                                          [:h1 {:class (str "text-xl" (when (.-completed todo) " text-stone-400 line-through"))} (.-name todo)]
-                                         [:p {:class (when (.-completed todo) "text-stone-400 line-through")} (.-description todo)]]]) @todos)]
+                                         [:p {:class (when (.-completed todo) "text-stone-400 line-through")} (.-description todo)]]
+                                        [:button {:class "ml-auto flex justify-center items-center" :on-click (fn [] (-> (delete-todo todo) ((fn [_] (load-todos)))))}
+                                         [:img {:width "24" :height "24"
+                                                :src "https://api.iconify.design/material-symbols:delete-outline.svg"
+                                                :alt "delete to-do button"}]]]) @todos)]
                            [:button {:class ["bg-stone-300 mt-3"] :on-click (fn [] (rfe/push-state ::newtodo))} "New todo"]]))
       :component-did-mount load-todos})))
 
