@@ -4,7 +4,10 @@
   "description": "To do list app made with clojure and luminus",
   "scripts": {
     "dev": "shadow-cljs watch app",
-    "build": "lein uberjar",
+    "build": "shadow-cljs compile app",
+    "start": "lein run",
+    "migrate": "lein migratus migrate",
+    "rollback": "lein migratus rollback",
     "tailwind": "tailwindcss -i ./resources/public/css/base.css -o ./resources/public/css/styles.css",
     "tailwind:watch": "tailwindcss -i ./resources/public/css/base.css -o ./resources/public/css/styles.css --watch"
   },

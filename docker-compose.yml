@@ -5,7 +5,6 @@ services:
       - ${PWD}:/home/app/
     ports:
       - "3000:3000"
-      - "7000:7000"
     network_mode: "host"
   db:
     image: postgres
